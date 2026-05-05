@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LaTeX Py</title>
+  <link rel="stylesheet" href="editor.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="header">
+    <h1><span class="ff-logo"></span>LaTeX<span class="accent">Py</span></h1>
+    <div class="header-controls">
+      <input id="project-name" class="filename-input" type="text" value="Mein Projekt" spellcheck="false">
+      <button id="btn-save" class="btn btn-save">↓ .tex</button>
+    </div>
+  </header>
+
+  <main class="canvas" id="canvas">
+
+    <!-- Editor Widget -->
+    <div class="widget" id="w-editor">
+      <div class="widget-header" data-widget="w-editor">
+        <span class="widget-title">✏ EDITOR</span>
+        <div class="widget-btns">
+          <button id="btn-compile" class="btn btn-compile-mini" title="Kompilieren">▶ PDF</button>
+          <button class="widget-toggle" data-widget="w-editor" title="Zuklappen">−</button>
+        </div>
+      </div>
+      <div class="widget-body">
+        <div class="editor-body">
+          <div class="line-numbers" id="line-numbers"></div>
+          <div class="editor-wrapper">
+            <pre class="highlight-layer" id="highlight-layer"></pre>
+            <textarea id="code-editor" class="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Widget -->
+    <div class="widget" id="w-preview">
+      <div class="widget-header" data-widget="w-preview">
+        <span class="widget-title">📄 VORSCHAU</span>
+        <div class="widget-btns">
+          <button class="widget-toggle" data-widget="w-preview" title="Zuklappen">−</button>
+        </div>
+      </div>
+      <div class="widget-body">
+        <div class="preview-body">
+          <div id="pdf-placeholder" class="empty-preview">
+            <div class="empty-hint">
+              <div class="empty-icon">📋</div>
+              <p>Klicke <strong>▶ PDF</strong> um zu kompilieren</p>
+            </div>
+          </div>
+          <iframe id="pdf-viewer" class="pdf-iframe" style="display:none;" title="PDF"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- FileTree Widget -->
+    <div class="widget" id="w-filetree">
+      <div class="widget-header" data-widget="w-filetree">
+        <span class="widget-title">📂 DOKUMENTE</span>
+        <div class="widget-btns">
+          <button class="widget-toggle" data-widget="w-filetree" title="Zuklappen">−</button>
+        </div>
+      </div>
+      <div class="widget-body">
+        <ul id="file-tree" class="doc-list"></ul>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="context-menu" class="context-menu" style="display:none;">
+    <button class="context-item" data-action="rename">✏️ Umbenennen</button>
+    <button class="context-item" data-action="delete">🗑️ Löschen</button>
+    <div class="context-divider"></div>
+    <button class="context-item" data-action="duplicate">📋 Duplizieren</button>
+  </div>
+
+  <div id="confirm-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-box">
+      <p id="confirm-msg" class="modal-msg"></p>
+      <div class="modal-actions">
+        <button id="confirm-yes" class="btn btn-danger">Löschen</button>
+        <button id="confirm-no" class="btn">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="compile-overlay" class="compile-overlay" style="display:none;">
+    <span class="spinner"></span><p>Kompilierung läuft…</p>
+  </div>
+
+  <script src="editor.js"></script>
+</body>
+</html>

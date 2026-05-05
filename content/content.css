@@ -1,0 +1,92 @@
+/* LaTeX Editor Pro - Content Script Styles */
+
+.latex-editor-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2147483647;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #00d4ff, #0090ff);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 144, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: scale(0.8) translateY(10px);
+  pointer-events: none;
+}
+
+.latex-editor-fab.visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: all;
+}
+
+.latex-editor-fab:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 144, 255, 0.5);
+}
+
+.latex-editor-fab svg {
+  width: 24px;
+  height: 24px;
+  color: white;
+}
+
+/* Split screen container */
+.latex-editor-split-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50vw;
+  height: 100vh;
+  z-index: 2147483646;
+  border-left: 2px solid #00d4ff;
+  box-shadow: -4px 0 30px rgba(0, 0, 0, 0.5);
+  transition: width 0.3s ease;
+}
+
+.latex-editor-split-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.latex-editor-split-resize {
+  position: absolute;
+  left: -4px;
+  top: 0;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 2147483647;
+}
+
+.latex-editor-split-close {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2147483647;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #161b22;
+  border: 1px solid #30363d;
+  color: #e6edf3;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.latex-editor-split-close:hover {
+  background: #da3633;
+  border-color: #da3633;
+}

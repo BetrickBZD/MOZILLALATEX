@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <div class="logo-row">
+        <span class="logo" aria-hidden="true"></span>
+        <h1>LaTeX<span class="pro">Py</span></h1>
+      </div>
+      <p class="subtitle">Öffne den Editor als neuen Tab oder als Split-Screen.</p>
+    </div>
+    <div class="popup-actions">
+      <button id="btn-new-tab" class="btn btn-primary">
+        📄 Neuer Tab
+      </button>
+      <button id="btn-split" class="btn btn-secondary">
+        ↔ Split Screen
+      </button>
+    </div>
+    <div class="popup-footer">
+      <span class="version">v1.0.0</span>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

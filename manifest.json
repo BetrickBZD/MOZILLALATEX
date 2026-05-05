@@ -1,0 +1,42 @@
+{
+  "manifest_version": 2,
+  "name": "LaTeX Editor Pro",
+  "version": "1.0.0",
+  "description": "Ein leistungsstarker LaTeX-Editor mit PDF-Vorschau, Dateibaum und Kompilierungsunterstützung direkt im Browser.",
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    },
+    "default_popup": "popup/popup.html",
+    "default_title": "LaTeX Editor Pro"
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "contextMenus",
+    "tabs",
+    "https://texlive.net/*"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "css": ["content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    "editor/editor.html",
+    "editor/editor.css",
+    "editor/editor.js",
+    "icons/*"
+  ]
+}
