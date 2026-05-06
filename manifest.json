@@ -4,10 +4,11 @@
   "version": "1.0.0",
   "browser_specific_settings": {
     "gecko": {
-      "id": "{d3c75e4c-6de7-4485-aaa3-9befba3da176}@latexpy.editor",
+      "id": "latexpy-editor@betrickbzd",
       "update_url": "https://raw.githubusercontent.com/BetrickBZD/MOZILLALATEX/main/updates.json"
     }
   },
+  "data_collection_permissions": false,
   "description": "Ein leistungsstarker LaTeX-Editor mit PDF-Vorschau, Dateibaum und Kompilierungsunterstützung direkt im Browser.",
   "icons": {
     "48": "icons/icon-48.png",

@@ -238,10 +238,24 @@ class App{
     const ul=this.el.tree;ul.innerHTML='';
     if(!this.files||!this.files.length){ul.innerHTML='<li class="doc-empty">Keine Dokumente</li>';return;}
     this.files.forEach(name=>{
-      const li=document.createElement('li');li.className='doc-item'+(name===this.activeFileId?' active':'');
-      li.innerHTML=`<span class="doc-icon">📄</span><span class="doc-name">${name}</span><div class="doc-actions"><button class="action-btn" data-a="open" data-n="${name}">📂</button><button class="action-btn" data-a="ren" data-n="${name}">✏️</button><button class="action-btn delete" data-a="del" data-n="${name}">🗑️</button></div>`;
+      const li=document.createElement('li');
+      li.className='doc-item'+(name===this.activeFileId?' active':'');
+      
+      const icon=document.createElement('span'); icon.className='doc-icon'; icon.textContent='📄';
+      const nameSpan=document.createElement('span'); nameSpan.className='doc-name'; nameSpan.textContent=name;
+      const actions=document.createElement('div'); actions.className='doc-actions';
+      
+      const btnOpen=document.createElement('button'); btnOpen.className='action-btn'; btnOpen.textContent='📂';
+      btnOpen.onclick=e=>{e.stopPropagation();this.openDoc(name);};
+      const btnRen=document.createElement('button'); btnRen.className='action-btn'; btnRen.textContent='✏️';
+      btnRen.onclick=e=>{e.stopPropagation();this.startRename(name,li);};
+      const btnDel=document.createElement('button'); btnDel.className='action-btn delete'; btnDel.textContent='🗑️';
+      btnDel.onclick=e=>{e.stopPropagation();this.confirmDel(name);};
+      
+      actions.append(btnOpen, btnRen, btnDel);
+      li.append(icon, nameSpan, actions);
+
       li.addEventListener('dblclick',()=>this.openDoc(name));
-      li.querySelectorAll('.action-btn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();const a=b.dataset.a,n=b.dataset.n;if(a==='open')this.openDoc(n);else if(a==='ren')this.startRename(n,li);else if(a==='del')this.confirmDel(n);}));
       li.addEventListener('contextmenu',e=>{e.preventDefault();this.contextTarget=name;this.el.ctx.style.display='block';this.el.ctx.style.left=e.clientX+'px';this.el.ctx.style.top=e.clientY+'px';});
       ul.appendChild(li);
     });
@@ -249,7 +263,26 @@ class App{
 
   async openDoc(n){try{const r=await fetch(`${API}/api/documents/${encodeURIComponent(n)}/tex`);const d=await r.json();if(d.code){this.latexCode=d.code;this.el.editor.value=d.code;this.filename=n;this.el.name.value=n;this.db.setKV('latex_content',d.code);this.activeFileId=n;this.onInput();this.renderTree();this.el.pdf.src=`${API}/api/documents/${encodeURIComponent(n)}/pdf?t=${Date.now()}`;this.el.pdf.style.display='block';this.el.ph.style.display='none';}}catch(e){}}
 
-  startRename(n,li){const s=li.querySelector('.doc-name');const old=s.textContent;s.innerHTML=`<input class="rename-input" value="${old}">`;const inp=s.querySelector('input');inp.select();inp.focus();const c=async()=>{const nn=inp.value.trim();if(nn&&nn!==old){try{await fetch(`${API}/api/documents/${encodeURIComponent(old)}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({new_name:nn})});this.fetchDocs();}catch(e){s.textContent=old;}}else s.textContent=old;};inp.addEventListener('keydown',e=>{if(e.key==='Enter')c();if(e.key==='Escape')s.textContent=old;});inp.addEventListener('blur',c);}
+  startRename(n,li){
+    const s=li.querySelector('.doc-name');
+    const old=s.textContent;
+    s.textContent='';
+    const inp=document.createElement('input');
+    inp.className='rename-input';
+    inp.value=old;
+    s.appendChild(inp);
+    inp.select();
+    inp.focus();
+    const c=async()=>{
+      const nn=inp.value.trim();
+      if(nn&&nn!==old){
+        try{await fetch(`${API}/api/documents/${encodeURIComponent(old)}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({new_name:nn})});this.fetchDocs();}
+        catch(e){s.textContent=old;}
+      }else s.textContent=old;
+    };
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')c();if(e.key==='Escape')s.textContent=old;});
+    inp.addEventListener('blur',c);
+  }
 
   confirmDel(n){this.el.msg.textContent=`„${n}.tex" löschen?`;this.el.modal.style.display='flex';const y=async()=>{await fetch(`${API}/api/documents/${encodeURIComponent(n)}`,{method:'DELETE'});this.el.modal.style.display='none';cl();this.fetchDocs();};const no=()=>{this.el.modal.style.display='none';cl();};const cl=()=>{this.el.yes.removeEventListener('click',y);this.el.no.removeEventListener('click',no);};this.el.yes.addEventListener('click',y);this.el.no.addEventListener('click',no);}
 
