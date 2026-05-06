@@ -1,0 +1,41 @@
+name: Sign and Release Extension
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install web-ext
+        run: npm install --global web-ext
+
+      - name: Sign Extension
+        id: sign
+        run: |
+          # Note: This will sign the extension as unlisted
+          # It generates an .xpi file
+          web-ext sign --api-key ${{ secrets.AMO_JWT_ISSUER }} --api-secret ${{ secrets.AMO_JWT_SECRET }} --channel unlisted
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+
+      - name: Get signed filename
+        id: get_filename
+        run: |
+          FILENAME=$(ls web-ext-artifacts/*.xpi | head -n 1)
+          echo "filename=$FILENAME" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ${{ steps.get_filename.outputs.filename }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
