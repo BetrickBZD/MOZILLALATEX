@@ -32,6 +32,12 @@ jobs:
           FILENAME=$(ls web-ext-artifacts/*.xpi | head -n 1)
           echo "filename=$FILENAME" >> $GITHUB_OUTPUT
 
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: signed-extension
+          path: ${{ steps.get_filename.outputs.filename }}
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
