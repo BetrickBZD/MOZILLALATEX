@@ -53,6 +53,12 @@ $$e^{i\\pi} + 1 = 0$$
    ═══════════════════════════════════════════════ */
 
 
+function updateGridColumns(){
+  const canvas = document.getElementById('canvas');
+  const widgets = [...canvas.querySelectorAll('.widget')];
+  canvas.style.gridTemplateColumns = widgets.map(w => w.classList.contains('collapsed') ? 'auto' : '1fr').join(' ');
+}
+
 function initWidgets(){
   const canvas = document.getElementById('canvas');
 
@@ -66,9 +72,10 @@ function initWidgets(){
       const collapsed = w.classList.toggle('collapsed');
       tog.textContent = collapsed ? '+' : '−';
       tog.title = collapsed ? 'Aufklappen' : 'Zuklappen';
+      updateGridColumns();
     });
 
-    // ── Drag to reorder in grid ──
+    // ── Drag to reorder ──
     hdr.addEventListener('mousedown', e=>{
       if(e.button!==0 || e.target.closest('button')) return;
       e.preventDefault();
@@ -95,7 +102,12 @@ function initWidgets(){
           if(ev.clientX>=r.left && ev.clientX<=r.right && ev.clientY>=r.top && ev.clientY<=r.bottom){
             if(target === placeholder) break;
             const midX = r.left + r.width/2;
-            if(ev.clientX < midX){
+            const midY = r.top + r.height/2;
+            // Use whichever axis the cursor is further from center on
+            const dx = Math.abs(ev.clientX - midX) / (r.width/2);
+            const dy = Math.abs(ev.clientY - midY) / (r.height/2);
+            const before = dx > dy ? (ev.clientX < midX) : (ev.clientY < midY);
+            if(before){
               canvas.insertBefore(placeholder, target);
             } else {
               canvas.insertBefore(placeholder, target.nextSibling);
@@ -116,12 +128,15 @@ function initWidgets(){
           canvas.insertBefore(w, placeholder);
           placeholder.remove();
         }
+        updateGridColumns();
       };
 
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup', onUp);
     });
   });
+
+  updateGridColumns();
 }
 
 /* ═══════════════════════════════════════════════
@@ -136,7 +151,7 @@ class App{
       editor:document.getElementById('code-editor'),hl:document.getElementById('highlight-layer'),
       ln:document.getElementById('line-numbers'),name:document.getElementById('project-name'),
       compile:document.getElementById('btn-compile'),save:document.getElementById('btn-save'),
-      pdf:document.getElementById('pdf-viewer'),ph:document.getElementById('pdf-placeholder'),
+      pdf:document.getElementById('pdf-viewer'),ph:document.getElementById('pdf-placeholder'),savePanel:document.getElementById('btn-save-panel'),
       overlay:document.getElementById('compile-overlay'),tree:document.getElementById('file-tree'),
       ctx:document.getElementById('context-menu'),modal:document.getElementById('confirm-modal'),
       msg:document.getElementById('confirm-msg'),yes:document.getElementById('confirm-yes'),
@@ -159,6 +174,7 @@ class App{
     ed.addEventListener('keydown',e=>this.onKey(e));
     this.el.compile.addEventListener('click',()=>this.compile());
     this.el.save.addEventListener('click',()=>this.saveTex());
+    this.el.savePanel.addEventListener('click',()=>this.saveToFileTree());
     this.el.name.addEventListener('change',()=>{this.filename=this.el.name.value;this.db.setKV('latex_filename',this.filename);});
     document.addEventListener('click',()=>{this.el.ctx.style.display='none';});
     document.querySelectorAll('.context-item').forEach(i=>i.addEventListener('click',()=>this.ctxAction(i.dataset.action)));
@@ -197,6 +213,21 @@ class App{
   }
 
   saveTex(){const b=new Blob([this.latexCode],{type:'application/x-tex'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=this.filename.endsWith('.tex')?this.filename:this.filename+'.tex';a.click();URL.revokeObjectURL(u);}
+
+  async saveToFileTree(){
+    const name=this.filename||'document';
+    await this.db.put({id:name,name:name,content:this.latexCode});
+    await this.db.setKV('latex_content',this.latexCode);
+    await this.db.setKV('latex_filename',name);
+    // Add to local files list if not already there
+    if(!this.files.includes(name)) this.files.push(name);
+    this.activeFileId=name;
+    this.renderTree();
+    // Brief visual feedback on the save button
+    const btn=this.el.savePanel;
+    btn.textContent='✅';
+    setTimeout(()=>{btn.textContent='💾';},800);
+  }
 
   async fetchDocs(){
     try{const r=await fetch(`${API}/api/documents`);this.files=await r.json();this.renderTree();}
