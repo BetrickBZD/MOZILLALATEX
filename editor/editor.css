@@ -1,67 +1,257 @@
-:root{--c:#1c1b22;--tb:#2b2a33;--sf:#38373f;--sh:#42414d;--bd:#52525e;--bs:#3a3944;--tx:#fbfbfe;--td:#cfcfcf;--tf:#8f8f9d;--bl:#0a84ff;--bh:#0060df;--or:#ff9500;--oh:#e07b00;--rd:#ff4f5e;--rh:#d7263d;}
+:root{--c:#1c1b22;--tb:#2b2a33;--sf:#38373f;--sh:#42414d;--bd:#52525e;--bs:#3a3944;--tx:#fbfbfe;--td:#cfcfcf;--tf:#8f8f9d;--bl:#0a84ff;--bh:#0060df;--or:#ff9500;--oh:#e07b00;--rd:#ff4f5e;--rh:#d7263d;--col-collapsed-w:36px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',-apple-system,sans-serif;background:var(--c);color:var(--tx);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
 
-/* Toolbar */
+/* ─── Toolbar ─── */
 .header{display:flex;justify-content:space-between;align-items:center;padding:0 1rem;height:48px;min-height:48px;background:var(--tb);border-bottom:1px solid var(--bd);flex-shrink:0;gap:1rem;}
 .header h1{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.4rem;white-space:nowrap;}
 .accent{color:var(--or);}
 .ff-logo{display:inline-block;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 38% 38%,#ff9500,#ff6611 55%,#c50042);box-shadow:0 0 10px rgba(255,149,0,.45);}
-.header-controls{display:flex;align-items:center;gap:.5rem;}
-.filename-input{background:var(--c);border:1px solid var(--bd);color:var(--tx);padding:.3rem .6rem;border-radius:4px;font-size:.82rem;font-family:inherit;min-width:140px;}
-.filename-input:focus{outline:none;border-color:var(--bl);box-shadow:0 0 0 2px rgba(10,132,255,.25);}
-
-/* Buttons */
+/* ─── Buttons ─── */
 .btn{background:var(--bl);color:#fff;border:none;padding:.35rem .8rem;border-radius:4px;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s;display:inline-flex;align-items:center;gap:.3rem;white-space:nowrap;}
 .btn-compile-mini{padding:.2rem .5rem;font-size:.72rem;border-radius:3px;}
 .btn:hover:not(:disabled){background:var(--bh);}
 .btn:disabled{opacity:.4;cursor:not-allowed;}
-.btn-save{background:var(--or);color:#000;}.btn-save:hover{background:var(--oh);}
 .btn-danger{background:var(--rd);color:#fff;}.btn-danger:hover{background:var(--rh);}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
 
-/* ═══ Canvas – CSS Grid for proper height constraints (scrolling) ═══ */
-.canvas{flex:1;display:grid;grid-template-rows:1fr;gap:6px;padding:6px;background:var(--c);overflow:hidden;min-height:0;}
+/* ─── Canvas: horizontal columns ─── */
+.canvas{
+  flex:1;
+  display:flex;
+  flex-direction:row;
+  gap:0;
+  padding:6px;
+  background:var(--c);
+  overflow:hidden;
+  min-height:0;
+}
 
-/* Collapsed widgets: only show header, align top-left */
-.canvas > .widget.collapsed{align-self:start;}
+/* ─── Resize handle between columns ─── */
+.col-resize-handle{
+  flex:0 0 6px;
+  min-width:6px;
+  cursor:col-resize;
+  background:transparent;
+  border-radius:3px;
+  position:relative;
+  transition:background .15s;
+  z-index:10;
+}
+.col-resize-handle::after{
+  content:'';
+  position:absolute;
+  inset:0 1px;
+  background:transparent;
+  border-radius:3px;
+  transition:background .15s;
+}
+.col-resize-handle:hover::after,
+.col-resize-handle.resizing::after{
+  background:var(--bl);
+}
 
-/* ═══ Widget ═══ */
-.widget{background:var(--tb);border:1px solid var(--bs);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.5);min-width:0;min-height:0;transition:box-shadow .15s,opacity .15s;}
+/* ─── Column ─── */
+/* Normal column: takes flexible space */
+.col{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1 1 0;
+  min-width:80px;
+  min-height:0;
+  overflow:hidden;
+  transition:max-width .2s ease, min-width .2s ease;
+}
+
+/* Collapsed column: fixed narrow strip */
+.col.col-collapsed{
+  flex:0 0 var(--col-collapsed-w);
+  min-width:var(--col-collapsed-w);
+  max-width:var(--col-collapsed-w);
+  gap:0;
+}
+
+/* Drag-over indicator */
+.col.drag-over{
+  outline:2px dashed var(--bl);
+  outline-offset:-2px;
+  background:rgba(10,132,255,.04);
+  border-radius:8px;
+}
+
+/* ─── Widget ─── */
+.widget{
+  background:var(--tb);
+  border:1px solid var(--bs);
+  border-radius:8px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  min-width:0;
+  min-height:0;
+  transition:box-shadow .15s, opacity .15s;
+  flex:1 1 0;  /* fills available column space */
+}
 .widget:hover{box-shadow:0 6px 28px rgba(0,0,0,.6);}
 .widget.dragging{opacity:.35;}
-.widget.collapsed .widget-body{display:none;}
-.widget.collapsed{grid-row:span 1;}
-.drop-placeholder{border:2px dashed var(--bl);border-radius:8px;background:rgba(10,132,255,.06);min-height:60px;flex:1 1 250px;}
 
-/* Widget header */
-.widget-header{padding:0 .6rem;height:36px;min-height:36px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;background:var(--sf);cursor:grab;user-select:none;border-radius:8px 8px 0 0;flex-shrink:0;}
+/* Collapsed widget in NORMAL column: shrink to just the header bar (36px) */
+.widget.collapsed{
+  flex:0 0 36px;
+  min-height:36px;
+  overflow:hidden;
+}
+.widget.collapsed .widget-body{display:none;}
+
+/* Collapsed widget inside a FULLY-COLLAPSED column (strip mode):
+   each widget stretches equally to fill the column height */
+.col.col-collapsed .widget.collapsed{
+  flex:1 1 0;
+  min-height:0;
+}
+
+/* Drop placeholder between widgets in a column */
+.drop-placeholder{
+  border:2px dashed var(--bl);
+  border-radius:8px;
+  background:rgba(10,132,255,.06);
+  flex:1 1 80px;
+  min-height:40px;
+}
+
+/* ─── Widget header ─── */
+.widget-header{
+  padding:0 .5rem;
+  height:36px;
+  min-height:36px;
+  border-bottom:1px solid var(--bd);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--sf);
+  cursor:grab;
+  user-select:none;
+  border-radius:8px 8px 0 0;
+  flex-shrink:0;
+  gap:.4rem;
+}
 .widget-header:active{cursor:grabbing;}
-.widget.collapsed .widget-header{border-bottom:none;border-radius:8px;}
-.widget-title{font-size:.72rem;font-weight:700;color:var(--td);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:.4rem;}
-.widget-btns{display:flex;align-items:center;gap:.35rem;flex-shrink:0;}
-.widget-toggle{background:transparent;border:1px solid var(--bs);color:var(--tf);width:22px;height:22px;border-radius:4px;cursor:pointer;font-size:.85rem;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s,border-color .12s;}
+/* Collapsed widget header in NORMAL column: stays horizontal, just hides bottom border */
+.widget.collapsed .widget-header{
+  border-bottom:none;
+  border-radius:8px;
+}
+
+/* Collapsed widget header in STRIP column: rotate to vertical layout */
+.col.col-collapsed .widget.collapsed .widget-header{
+  flex-direction:column;
+  height:100%;
+  width:100%;
+  padding:.5rem 0;
+  justify-content:center;
+  align-items:center;
+  cursor:grab;
+  border-bottom:none;
+  border-radius:0;
+}
+
+/* Titles: we have two versions — normal and rotated */
+.widget-title-normal{
+  font-size:.72rem;
+  font-weight:700;
+  color:var(--td);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  flex:1;
+  min-width:0;
+}
+.widget-title-rotated{
+  display:none;  /* hidden in normal state */
+  font-size:.68rem;
+  font-weight:700;
+  color:var(--td);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  white-space:nowrap;
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  transform:rotate(180deg);
+  margin-top:.4rem;
+  flex:1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* In NORMAL column: collapsed widget keeps normal title, hides extra buttons */
+.widget.collapsed .btn-compile-mini{display:none;}
+.widget.collapsed .btn-save-panel{display:none;}
+
+/* In STRIP column: show rotated title, hide normal title */
+.col.col-collapsed .widget.collapsed .widget-title-normal{display:none;}
+.col.col-collapsed .widget.collapsed .widget-title-rotated{display:flex;align-items:center;justify-content:center;}
+
+/* Toggle button */
+.widget-btns{display:flex;align-items:center;gap:.3rem;flex-shrink:0;}
+.widget-toggle{
+  background:transparent;
+  border:1px solid var(--bs);
+  color:var(--tf);
+  width:22px;height:22px;
+  border-radius:4px;
+  cursor:pointer;
+  font-size:.85rem;
+  line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .12s,color .12s,border-color .12s;
+  flex-shrink:0;
+}
 .widget-toggle:hover{background:var(--sh);color:var(--tx);border-color:var(--bd);}
 
-/* Save icon button in widget header */
-.btn-save-panel{background:transparent;border:1px solid var(--bs);color:var(--tf);width:22px;height:22px;border-radius:4px;cursor:pointer;font-size:.78rem;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s,border-color .12s;}
-.btn-save-panel:hover{background:rgba(255,149,0,.2);color:var(--or);border-color:var(--or);}
+/* In STRIP column: toggle sits below title */
+.col.col-collapsed .widget.collapsed .widget-btns{
+  flex-direction:column;
+  margin-top:.5rem;
+}
 
+/* Save text button in preview header */
+.btn-save-panel{
+  background:transparent;border:1px solid var(--bs);color:var(--td);
+  height:22px;padding:0 .55rem;border-radius:4px;cursor:pointer;
+  font-size:.72rem;font-weight:600;font-family:inherit;
+  letter-spacing:.04em;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .12s,color .12s,border-color .12s;
+}
+.btn-save-panel:hover{background:rgba(255,149,0,.18);color:var(--or);border-color:var(--or);}
 
-/* ═══ Editor ═══ */
+/* ─── STACKED STRIP: widgets share the narrow column ─── */
+/* Adjacent collapsed widgets in a strip are visually separated by a thin divider */
+.col.col-collapsed .widget.collapsed + .widget.collapsed{
+  border-top:1px solid var(--bd);
+}
+/* Round the outer corners of the strip */
+.col.col-collapsed .widget.collapsed:first-child .widget-header{border-radius:8px 8px 0 0;}
+.col.col-collapsed .widget.collapsed:last-child .widget-header{border-radius:0 0 8px 8px;}
+.col.col-collapsed .widget.collapsed:only-child .widget-header{border-radius:8px;}
+
+/* ─── Editor ─── */
 .widget-body{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
 .editor-body{flex:1;display:flex;min-height:0;background:var(--c);font-family:'Fira Code','Consolas',monospace;font-size:13px;line-height:1.65;}
 .line-numbers{width:40px;padding:10px 6px 10px 0;text-align:right;color:var(--tf);font-family:inherit;font-size:13px;line-height:1.65;user-select:none;overflow:hidden;flex-shrink:0;background:var(--c);border-right:1px solid var(--bs);}
 .line-number{display:block;padding-right:4px;}
 .editor-wrapper{flex:1;position:relative;overflow:hidden;}
 .code-editor,.highlight-layer{position:absolute;inset:0;padding:10px;font-family:inherit;font-size:13px;line-height:1.65;tab-size:2;white-space:pre;overflow:auto;word-wrap:normal;}
-/* FIX: make textarea text transparent so only the highlight layer shows colored text; caret stays visible */
 .code-editor{background:transparent;color:transparent;caret-color:var(--bl);border:none;outline:none;resize:none;z-index:2;}
 .highlight-layer{z-index:1;color:var(--tx);pointer-events:none;margin:0;background:var(--c);}
 .hl-command{color:#7ee787}.hl-keyword{color:#ff7b72;font-weight:600}.hl-comment{color:#8b949e;font-style:italic}.hl-math{color:#d2a8ff}.hl-brace,.hl-bracket{color:#ffa657}.hl-section{color:#ff9bce;font-weight:700}
 
-/* ═══ Preview ═══ */
+/* ─── Preview ─── */
 .preview-body{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
 .pdf-iframe{flex:1;width:100%;border:none;}
 .empty-preview{flex:1;display:flex;align-items:center;justify-content:center;}
@@ -69,7 +259,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--c);color:var(
 .empty-icon{font-size:2.5rem;filter:grayscale(.3);}
 .empty-hint p{font-size:.85rem;line-height:1.5;}
 
-/* ═══ File tree ═══ */
+/* ─── File tree ─── */
 .doc-list{list-style:none;overflow-y:auto;flex:1;padding:4px 0;}
 .doc-list::-webkit-scrollbar{width:5px}.doc-list::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
 .doc-empty{padding:1rem .8rem;font-size:.8rem;color:var(--tf);font-style:italic;text-align:center;}
@@ -86,7 +276,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--c);color:var(
 .action-btn:hover{background:rgba(255,255,255,.09);color:var(--tx);}
 .action-btn.delete:hover{background:rgba(255,79,94,.18);color:var(--rd);}
 
-/* ═══ Context / Modal / Overlay ═══ */
+/* ─── Context / Modal / Overlay ─── */
 .context-menu{position:fixed;z-index:1000;background:var(--tb);border:1px solid var(--bd);border-radius:6px;padding:4px;min-width:160px;box-shadow:0 8px 30px rgba(0,0,0,.5);}
 .context-item{display:flex;align-items:center;gap:6px;width:100%;padding:6px 10px;border:none;background:transparent;color:var(--tx);font-family:inherit;font-size:.82rem;cursor:pointer;border-radius:4px;transition:background .12s;text-align:left;}
 .context-item:hover{background:var(--sh);}.context-item[data-action="delete"]:hover{background:rgba(255,79,94,.15);color:var(--rd);}

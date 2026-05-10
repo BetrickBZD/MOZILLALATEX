@@ -11,66 +11,71 @@
 
   <header class="header">
     <h1><span class="ff-logo"></span>LaTeX<span class="accent">Py</span></h1>
-    <div class="header-controls">
-      <input id="project-name" class="filename-input" type="text" value="Mein Projekt" spellcheck="false">
-      <button id="btn-save" class="btn btn-save">↓ .tex</button>
-    </div>
   </header>
 
   <main class="canvas" id="canvas">
 
-    <!-- Editor Widget -->
-    <div class="widget" id="w-editor">
-      <div class="widget-header" data-widget="w-editor">
-        <span class="widget-title">✏ EDITOR</span>
-        <div class="widget-btns">
-          <button id="btn-compile" class="btn btn-compile-mini" title="Kompilieren">▶ PDF</button>
-          <button class="widget-toggle" data-widget="w-editor" title="Zuklappen">−</button>
-        </div>
-      </div>
-      <div class="widget-body">
-        <div class="editor-body">
-          <div class="line-numbers" id="line-numbers"></div>
-          <div class="editor-wrapper">
-            <pre class="highlight-layer" id="highlight-layer"></pre>
-            <textarea id="code-editor" class="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+    <!-- Column 1: Editor -->
+    <div class="col" id="col-editor" data-col="0">
+      <div class="widget" id="w-editor" data-col="0" data-row="0">
+        <div class="widget-header" data-widget="w-editor">
+          <span class="widget-title-rotated">✏ EDITOR</span>
+          <span class="widget-title-normal">✏ EDITOR</span>
+          <div class="widget-btns">
+            <button id="btn-compile" class="btn btn-compile-mini" title="Kompilieren">Compile</button>
+            <button class="widget-toggle" title="Zuklappen">−</button>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Preview Widget -->
-    <div class="widget" id="w-preview">
-      <div class="widget-header" data-widget="w-preview">
-        <span class="widget-title">📄 VORSCHAU</span>
-        <div class="widget-btns">
-          <button id="btn-save-panel" class="btn-save-panel" title="Speichern & in Dokumenten anzeigen">💾</button>
-          <button class="widget-toggle" data-widget="w-preview" title="Zuklappen">−</button>
-        </div>
-      </div>
-      <div class="widget-body">
-        <div class="preview-body">
-          <div id="pdf-placeholder" class="empty-preview">
-            <div class="empty-hint">
-              <div class="empty-icon">📋</div>
-              <p>Klicke <strong>▶ PDF</strong> um zu kompilieren</p>
+        <div class="widget-body">
+          <div class="editor-body">
+            <div class="line-numbers" id="line-numbers"></div>
+            <div class="editor-wrapper">
+              <pre class="highlight-layer" id="highlight-layer"></pre>
+              <textarea id="code-editor" class="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
             </div>
           </div>
-          <iframe id="pdf-viewer" class="pdf-iframe" style="display:none;" title="PDF"></iframe>
         </div>
       </div>
     </div>
 
-    <!-- FileTree Widget -->
-    <div class="widget" id="w-filetree">
-      <div class="widget-header" data-widget="w-filetree">
-        <span class="widget-title">📂 DOKUMENTE</span>
-        <div class="widget-btns">
-          <button class="widget-toggle" data-widget="w-filetree" title="Zuklappen">−</button>
+    <!-- Column 2: Preview -->
+    <div class="col" id="col-preview" data-col="1">
+      <div class="widget" id="w-preview" data-col="1" data-row="0">
+        <div class="widget-header" data-widget="w-preview">
+          <span class="widget-title-rotated">📄 VORSCHAU</span>
+          <span class="widget-title-normal">📄 VORSCHAU</span>
+          <div class="widget-btns">
+            <button id="btn-save-panel" class="btn-save-panel" title="Speichern & in Dokumenten anzeigen">Save</button>
+            <button class="widget-toggle" title="Zuklappen">−</button>
+          </div>
+        </div>
+        <div class="widget-body">
+          <div class="preview-body">
+            <div id="pdf-placeholder" class="empty-preview">
+              <div class="empty-hint">
+                <div class="empty-icon">📋</div>
+                <p>Klicke <strong>Compile</strong> um zu kompilieren</p>
+              </div>
+            </div>
+            <iframe id="pdf-viewer" class="pdf-iframe" style="display:none;" title="PDF"></iframe>
+          </div>
         </div>
       </div>
-      <div class="widget-body">
-        <ul id="file-tree" class="doc-list"></ul>
+    </div>
+
+    <!-- Column 3: FileTree -->
+    <div class="col" id="col-filetree" data-col="2">
+      <div class="widget" id="w-filetree" data-col="2" data-row="0">
+        <div class="widget-header" data-widget="w-filetree">
+          <span class="widget-title-rotated">📂 DOKUMENTE</span>
+          <span class="widget-title-normal">📂 DOKUMENTE</span>
+          <div class="widget-btns">
+            <button class="widget-toggle" title="Zuklappen">−</button>
+          </div>
+        </div>
+        <div class="widget-body">
+          <ul id="file-tree" class="doc-list"></ul>
+        </div>
       </div>
     </div>
 

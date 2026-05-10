@@ -3,6 +3,10 @@
     "latexpy-editor@betrickbzd": {
       "updates": [
         {
+          "version": "1.0.2",
+          "update_link": "https://github.com/BetrickBZD/MOZILLALATEX/releases/latest/download/latex_editor_pro-1.0.2.xpi"
+        },
+        {
           "version": "1.0.1",
           "update_link": "https://github.com/BetrickBZD/MOZILLALATEX/releases/latest/download/latex_editor_pro-1.0.1.xpi"
         },
